@@ -1,6 +1,6 @@
 # Project
 
-Flask Multi DB blog
+Flask Blog website
 
 ## Languages
 
