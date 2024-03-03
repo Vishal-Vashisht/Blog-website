@@ -1,48 +1,23 @@
 from app.api.models.models import Logs
-from app.api.services.post import PostCreator, PostGetter, PostUpdate
+from app.api.services.comments import (CommentCreate, CommentDelete,
+                                       CommentUpdate)
 from app.constant.errors import ERRORS
 from config.logger_handler import logger
 from flask import Blueprint, request
 from flask.views import MethodView
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
-from serializers.serializers import PostsSchema, PostUpdateSchema
+from serializers.serializers import (CommentDeleteSchema, CommentSchema,
+                                     CommentUpdateSchema)
 
-postschema = PostsSchema()
-postupdateschema = PostUpdateSchema()
+comment_schema = CommentSchema()
+comment_delete_schema = CommentDeleteSchema()
+comment_update_schema = CommentUpdateSchema()
 
 
-class PostAPI(MethodView):
+class CommentsAPI(MethodView):
+
     decorators = [jwt_required()]
-
-    def get(self):
-        """
-        Handle Get request for creating comments.
-
-        Returns:
-            tuple: A tuple containing response data and status code.
-        """
-        try:
-            PostGetter().process_all_posts()
-            return (
-                postschema.dump(PostGetter().process_all_posts()),
-                200)
-
-        except ValidationError as valerror:
-            # Return validation error with status code 400
-            return str(valerror), 400
-        except Exception as e:
-            try:
-                # Attempt to log the error
-                Logs.create_log(str(e))
-
-            except Exception as log_error:
-                logger.exception(str(log_error))
-                # If logging fails, return internal server error
-                return ERRORS["INTERNAL_SERVER_ERROR"], 500
-            # Return internal server error if logging succeeds
-            logger.exception(str(e))
-            return ERRORS["INTERNAL_SERVER_ERROR"], 500
 
     def post(self):
         """
@@ -52,14 +27,12 @@ class PostAPI(MethodView):
             tuple: A tuple containing response data and status code.
         """
         try:
-            # POST request handling logic goes here
-            # Validation of the data
-            validated_data = postschema.load(request.get_json())
-            return (
-                postschema.dump(PostCreator(
-                    validated_data, get_jwt_identity).process_data()),
-                201
-                )
+
+            validated_data = comment_schema.load(request.get_json())
+
+            return comment_schema.dump(
+                CommentCreate(
+                    validated_data, get_jwt_identity).process_comment()), 201
 
         except ValidationError as valerror:
             # Return validation error with status code 400
@@ -85,9 +58,43 @@ class PostAPI(MethodView):
             tuple: A tuple containing response data and status code.
         """
         try:
-            validated_data = postupdateschema.load(request.get_json())
-            return (postupdateschema.dump(
-                PostUpdate(validated_data).post_update()), 200)
+            validated_data = comment_update_schema.load(request.get_json())
+
+            return comment_update_schema.dump(
+                CommentUpdate(
+                    validated_data).update_comment()
+                ), 200
+        except ValidationError as valerror:
+            # Return validation error with status code 400
+            return str(valerror), 400
+        except Exception as e:
+            try:
+                # Attempt to log the error
+                Logs.create_log(str(e))
+
+            except Exception as log_error:
+                logger.exception(str(log_error))
+                # If logging fails, return internal server error
+                return ERRORS["INTERNAL_SERVER_ERROR"], 500
+            # Return internal server error if logging succeeds
+            logger.exception(str(e))
+            return ERRORS["INTERNAL_SERVER_ERROR"], 500
+
+    def delete(self, comment_id):
+        """
+        Handle DELETE request for creating comments.
+
+        Returns:
+            tuple: A tuple containing response data and status code.
+        """
+        try:
+            data = {"comment_id": comment_id}
+            validated_data = comment_delete_schema.load(data)
+
+            return comment_delete_schema.dump(
+                CommentDelete(
+                    validated_data).delete_comment()
+                ), 403
         except ValidationError as valerror:
             # Return validation error with status code 400
             return str(valerror), 400
@@ -105,10 +112,9 @@ class PostAPI(MethodView):
             return ERRORS["INTERNAL_SERVER_ERROR"], 500
 
 
-# Creating blueprint
-post_bp = Blueprint(
-    'post', __name__,
-    url_prefix='/api/v1')
+# Create the blueprint
+commnet_bp = Blueprint("comments", __name__, url_prefix='/api/v1/comment')
 
-# URL to create, update, delete and get all the posts
-post_bp.add_url_rule('/post/', view_func=PostAPI.as_view('postapi'))
+commnet_bp.add_url_rule("/", view_func=CommentsAPI.as_view('comments'))
+commnet_bp.add_url_rule("/delete/<int:comment_id>",
+                        view_func=CommentsAPI.as_view('commentsdelete'))

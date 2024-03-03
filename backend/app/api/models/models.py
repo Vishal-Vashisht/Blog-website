@@ -83,6 +83,37 @@ class Comments(db.Model):
     posts = db.relationship("Posts", back_populates='postcomments')
     user = db.relationship("User", back_populates='usercomments')
 
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.exception(str(e))
+
+    def delete_(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.exception(str(e))
+
+    @classmethod
+    def create_comment(cls, **kwargs):
+
+        new_comment = cls(
+            post_id=kwargs["post_id"], comment=kwargs["comment"],
+            comment_by=kwargs["user"]
+        )
+        new_comment.save()
+        return new_comment
+
+    @classmethod
+    def delete_comment(cls, comment_id):
+        cls.query.filter_by(comment_id=comment_id).delete()
+        db.session.commit()
+
 
 class Likes(db.Model):
     __tablename__ = "likes"
@@ -146,6 +177,29 @@ class Logs(db.Model):
     def create_log(cls, log_data):
         log = cls(details=log_data)
         log.save()
+
+
+class TokenBlocklist(db.Model):
+
+    __tablename__ = 'tokenblocklist'
+    __bind_key__ = "pg_sql1"
+
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(36), nullable=False, index=True)
+    created_at = db.Column(db.DateTime, nullable=False)
+
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            logger.exception(str(e))
+
+    @classmethod
+    def insert_revoked_jti(cls, jti, time):
+        revoke_token = cls(jti=jti, created_at=time)
+        revoke_token.save()
 
 
 class Migrations:

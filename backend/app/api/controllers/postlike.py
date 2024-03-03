@@ -7,21 +7,31 @@ from flask.views import MethodView
 from marshmallow import ValidationError
 from serializers.serializers import PostLikeSchema
 from app.api.services.postlike import PostLikeDislike
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 postlike_schema = PostLikeSchema()
 
 
 class PostLikeAPI(MethodView):
 
+    decorators = [jwt_required()]
+
     # Post request to like dislike the post
     def post(self):
+        """
+        Handle POST request for creating comments.
+
+        Returns:
+            tuple: A tuple containing response data and status code.
+        """
         try:
 
             validated_data = postlike_schema.load(request.json)
 
-            return postlike_schema.dump(
+            return (postlike_schema.dump(
                 PostLikeDislike(
-                    validated_data).post_like_dislike_process()), 200
+                    validated_data,
+                    get_jwt_identity).post_like_dislike_process()), 200)
 
         except ValidationError as valerror:
             return str(valerror), 400

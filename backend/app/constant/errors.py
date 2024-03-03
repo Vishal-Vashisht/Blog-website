@@ -9,6 +9,16 @@ ERRORS = {
             {'DETAIL': 'post_id : post Id is required'}
         ]
     },
+    "POSTID_CONTENT_REQU": {
+        'ERRORS': [
+            {'DETAIL': 'post Id and content is required'}
+        ]
+    },
+    "POST_CONTENT_IS_SHORT": {
+        'ERRORS': [
+            {'DETAIL': 'Post content is too short'}
+        ]
+    },
     "POST_NOT_FOUND": {
         'ERRORS': [
             {"DETAIL": "Post not found"}
@@ -37,6 +47,55 @@ ERRORS = {
     "INVALID_CREDNTIALS": {
         'ERRORS': [
             {"DETAIL": "Invalid credntials"}
+        ]
+    },
+    "COMMENT_POST_ID_REQUIRED": {
+        'ERRORS': [
+            {"DETAIL": "Comment and post id is required"}
+        ]
+    },
+    "COMMENT_IS_SHORT": {
+        'ERRORS': [
+            {"DETAIL": "Comment is too short"}
+        ]
+    },
+    "INVALID_POST": {
+        'ERRORS': [
+            {"DETAIL": "Can't comment on this post"}
+        ]
+    },
+    "COMMENT_ID_NOT_PROVIDED": {
+        'ERRORS': [
+            {"DETAIL": "Comment and comment id not provided"}
+        ]
+    },
+    "INVALID_COMMENT": {
+        "ERRORS": [
+            {"DETAIL": "Invalid comment"}
+        ]
+    },
+    "COMMENTID_NOT_PROVIDED": {
+        'ERRORS': [
+            {"DETAIL": "Comment id not provided"}
+        ]
+    },
+}
+
+
+JWT_ERRORS = {
+    "JWT_TOKEN_EXPIRED": {
+        'ERRORS': [
+            {"DETAIL": "Token has expired"}
+        ]
+    },
+    "JWT_TOKEN_INVALID": {
+        'ERRORS': [
+            {"DETAIL": "Token is invalid"}
+        ]
+    },
+    "JWT_AUTH_REQUIRED": {
+        'ERRORS': [
+            {"DETAIL": "Authorization Required"}
         ]
     },
 }

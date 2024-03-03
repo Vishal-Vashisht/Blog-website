@@ -1,13 +1,28 @@
-from app.api.models.models import db, Posts, Likes
+from typing import Any, Callable, Dict
+
+from app.api.models.models import Likes, Posts, db
 
 
 class PostLikeDislike():
-    def __init__(self, data) -> None:
+    def __init__(self, data: Dict[str, Any],
+                 user_identity: Callable[[], str]) -> None:
+        """
+        Initialize the PostLikeDislike object with post data and user identity.
+
+        Args:
+            data (dict): A dictionary containing post data with the key "post_id".
+            user_identity (callable): A function that returns the user's identity.
+        """ # noqa
         self.data = data
-        self.user_id = 1
+        self.user_id = user_identity()
 
-    def post_like_dislike_process(self):
+    def post_like_dislike_process(self) -> Dict[str, Any]:
+        """
+        Process post like or dislike action.
 
+        Returns:
+            dict: A dictionary containing the total number of likes after the action.
+        """ # noqa
         try:
             # Get the post id
             post_id = self.data.get("post_id")

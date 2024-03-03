@@ -1,11 +1,22 @@
 
-from app.api.models.models import User
+from typing import Any, Dict, Optional
+
+from app.api.models.models import TokenBlocklist, User
 
 
 class SericeHelper():
 
     @staticmethod
-    def create_post_res(posts):
+    def create_post_res(posts: Any) -> Dict[str, Any]:
+        """
+        Create a dictionary representation of a post and its associated comments.
+
+        Args:
+            posts (object): A Post object containing information about the post.
+
+        Returns:
+            dict: A dictionary containing information about the post and its comments.
+        """ # noqa
         res = {}
         if posts:
             res["post_id"] = posts.post_id
@@ -25,5 +36,27 @@ class SericeHelper():
         return res
 
     @staticmethod
-    def is_user_exists(username):
+    def is_user_exists(username: str) -> Optional[User]:
+        """
+        Check if a user with the given username exists.
+
+        Args:
+            username (str): The username to check.
+
+        Returns:
+            Optional[User]: The user object if it exists, else None.
+        """# noqa
         return User.query.filter_by(username=username).first()
+
+    @staticmethod
+    def token_in_block_list(jti: str) -> Optional[TokenBlocklist]:
+        """
+        Check if a JWT token is in the blocklist.
+
+        Args:
+            jti (str): The JTI (JWT ID) to check.
+
+        Returns:
+            Optional[TokenBlocklist]: The TokenBlocklist object if the token is in the blocklist, else None.
+        """ # noqa
+        return TokenBlocklist.query.filter_by(jti=jti).first()
