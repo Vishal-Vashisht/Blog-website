@@ -49,7 +49,7 @@ db2_host=
 db2_dbname=
 
 environment = dev
-Make sure to name this variable with file name we goinng to created below In my case it's env
+Make sure to name this variable with file name we goinng to created below In my case it's dev
 ```
 - Create a **.py** file in the [config](backend/config) directory, you can name it dev.py, prod.py or qa.py as per you environment
     - You can make connection to any database and set it according to you'r requirements
@@ -86,7 +86,7 @@ JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=2)
 ## Create tables in the database
 - After completion of above task navigate to ```backend ``` directory and run create-db command.
 ```bash
-cd cd backend
+cd backend
 flask create-db
 ```
 
